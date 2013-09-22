@@ -134,15 +134,6 @@ module.exports = function(grunt) {
         autoWatch: true
       }
     },
-    ngmin: {
-      options: {
-        banner: '<%= meta.banner %>'
-      },
-      dist: {
-        src: ['<%= yo.src %>/*.js'],
-        dest: '<%= yo.dist %>/<%= pkg.name %>.js'
-      }
-    },
     concat: {
       options: {
         banner: '<%= meta.banner %>',
@@ -165,13 +156,29 @@ module.exports = function(grunt) {
         }
       }
     },
+    ngmin: {
+      options: {
+        banner: '<%= meta.banner %>',
+        expand: true
+      },
+      dist: {
+        files: {
+          '<%= yo.dist %>/<%= pkg.name %>.js': [
+            '<%= yo.dist %>/<%= pkg.name %>.js'
+          ]
+        }
+      }
+    },
     uglify: {
       options: {
         banner: '<%= meta.banner %>'
       },
       dist: {
-        src: '<%= concat.dist.dest %>',
-        dest: '<%= yo.dist %>/<%= pkg.name %>.min.js'
+        files: {
+          '<%= yo.dist %>/<%= pkg.name %>.min.js': [
+            '<%= Object.keys(ngmin.dist.files)[0] %>',
+          ]
+        }
       }
     },
     bump: {
@@ -193,7 +200,7 @@ module.exports = function(grunt) {
 
   grunt.registerTask('build', [
     'clean:dist',
-    'less:dist',
+    'concat:dist',
     'ngmin:dist',
     'uglify:dist'
   ]);
