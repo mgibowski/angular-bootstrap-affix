@@ -149,8 +149,20 @@ module.exports = function(grunt) {
         stripBanners: true
       },
       dist: {
-        src: ['<%= yo.src %>/<%= pkg.name %>.js'],
-        dest: '<%= yo.dist %>/<%= pkg.name %>.js'
+        options: {
+          // Replace all 'use strict' statements in the code with a single one at the top
+          banner: '(function(window, document, undefined) {\n\'use strict\';\n',
+          footer: '\n})(window, document);\n',
+          process: function(src, filepath) {
+            return '// Source: ' + filepath + '\n' +
+              src.replace(/(^|\n)[ \t]*('use strict'|"use strict");?\s*/g, '$1');
+          }
+        },
+        files: {
+          '<%= yo.dist %>/<%= pkg.name %>.js': [
+            '<%= yo.src %>/{,*/}*.js'
+          ]
+        }
       }
     },
     uglify: {
